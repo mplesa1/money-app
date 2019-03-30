@@ -1,15 +1,21 @@
 package hr.java.web.plesa.controller;
 
 import hr.java.web.plesa.domain.Expense;
+import hr.java.web.plesa.domain.Wallet;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 
+import javax.servlet.http.HttpSession;
+
+@Slf4j
 @Controller
 @RequestMapping("/expense")
+@SessionAttributes({"types", "wallet"})
 public class ExpenseController {
 
     @GetMapping("/new")
@@ -20,8 +26,35 @@ public class ExpenseController {
     }
 
     @PostMapping("/new")
-    public String processForm(Expense expense, Model model) {
-        model.addAttribute("expense", expense);
+    public String processForm(@Validated Expense expense, Errors errors, Model model, HttpSession session) {
+
+        if (errors.hasErrors()) {
+            log.info("Model has errore.");
+            return "newExpense";
+        }
+
+        var wallet = (Wallet)session.getAttribute("wallet");
+        wallet.addExpense(expense);
+
+        model.addAttribute("expenses", wallet.getExpenses());
+        model.addAttribute("total", wallet.getTotal());
         return "expenses";
+    }
+
+    @GetMapping("/resetWallet")
+    public String resetWallet(SessionStatus sessionStatus) {
+        sessionStatus.setComplete();
+        log.info("Wallet reset.");
+        return "redirect:/expense/new";
+    }
+
+    // when a request comes in, the first thing Spring will do is to notice @SessionAttributes
+    // and then attempt to find the value  in javax.servlet.http.HttpSession.
+    // If it doesn't find the value, then the method with @ModelAttribute having the same name
+    // will be invoked
+    @ModelAttribute("wallet")
+    public Wallet setWallet(Model model){
+        log.info("New wallet.");
+        return new Wallet();
     }
 }

@@ -7,7 +7,7 @@
 <head th:replace="fragments :: header"></head>
 <body>
 <div class="container">
-
+<div th:each="expense : ${expenses}">
     <h2>Unesen trošak:</h2>
     <h3>Naziv</h3> <br>
     <p th:text="${expense.name}"> </p>
@@ -16,9 +16,11 @@
     <h3>Vrsta troška</h3> <br>
     <p th:text="${expense.typeOfExpense}"> </p>
     <br>
-
+</div>
+    <h2>Stanje novčanika</h2>
+    <p th:text="${total}"></p>
     <button class="btn-warning" onclick="goBackPage()">Vratite se nazad</button>
-
+    <a class="btn btn-warning" href="/expense/resetWallet">Reset novčanik</a>
 </div>
 
 <div th:replace="fragments :: js"></div>
