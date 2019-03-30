@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+
+    <h4>Unosite novi trošak:</h4>
+    <form method="POST" th:object="${expense}" id="formExpense">
+
+
+        <div class="form-group">
+            <label for="name">Naziv</label>
+            <input type="text"	class="form-control" th:field="*{name}" />
+        </div>
+
+
+        <div class="form-group">
+            <label for="amount">Iznos</label>
+            <input type="number" class="form-control" th:field="*{amount}" min="0" placeholder="0.00" />
+        </div>
+
+        <div class="form-group">
+            <label for="typeOfExpense">Vrsta troška</label>
+            <select  class="form-control"
+                     th:field="*{typeOfExpense}">
+                <option value="">---Odaberite vrijednost---</option>
+                <option th:each="type : ${types}" th:value="${type}"
+                        th:text="${type}"></option>
+            </select>
+        </div>
+
+        <input type="submit" class="btn btn-secondary" value="Pošalji">
+        <input onclick="resetForm()" class="btn btn-warning" value="Obriši">
+    </form>
+</div>
+<script>
+    function resetForm() {
+        $("#formExpense")[0].reset();
+    }
+
+</script>
+<div th:replace="fragments :: js"></div>
+</body>
+</html>

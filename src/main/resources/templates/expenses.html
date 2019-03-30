@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+
+    <h2>Unesen trošak:</h2>
+    <h3>Naziv</h3> <br>
+    <p th:text="${expense.name}"> </p>
+    <h3>Iznos</h3> <br>
+    <p th:text="${expense.amount}"> </p>
+    <h3>Vrsta troška</h3> <br>
+    <p th:text="${expense.typeOfExpense}"> </p>
+    <br>
+
+    <button class="btn-warning" onclick="goBackPage()">Vratite se nazad</button>
+
+</div>
+
+<div th:replace="fragments :: js"></div>
+<script>
+    function goBackPage() {
+        window.history.back();
+    }
+</script>
+
+</body>
+</html>

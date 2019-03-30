@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+
+<body>
+<div class="container">
+    <button>
+        <a th:href="@{/expense/new}">Unesi novi trošak</a>
+    </button>
+</div>
+
+<div th:replace="fragments :: js"></div>
+</body>
+</html>
