@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+    <div th:each="statistic : ${expenseStatistics}">
+        <h2 th:text="${statistic.getName()}"></h2>
+        <h3>Ukupno</h3> <br>
+        <p th:text="${statistic.getTotalAmount()}"> </p>
+        <h3>Max</h3> <br>
+        <p th:text="${statistic.getMaxAmount()}"> </p>
+        <h3>Avg</h3> <br>
+        <p th:text="${statistic.getAvgAmount()}"> </p>
+        <br>
+    </div>
+
+</div>
+
+<div th:replace="fragments :: js"></div>
+
+</body>
+</html>
