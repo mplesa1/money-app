@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+
+<h3>Login with Username and Password</h3>
+
+<form name='f' method='POST' th:action="@{/login}">
+
+    <div class="card">
+        <div class="card-header">
+            LOGIN
+        </div>
+        <div class="card-body">
+            <label>Username: <input id="username" type='text' name='username' value='' /></label>
+            <label>Password: <input id="password" type='password' name='password'/></label>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+            <input type="submit" class="btn btn-primary" value="Login" />
+        </div>
+    </div>
+
+
+    <input type="hidden"  name="_csrf" th:value="${_csrf.token}"/>
+</form>
+
+
+<div th:replace="fragments :: js"></div>
+</body>
+</html>

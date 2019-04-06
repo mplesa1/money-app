@@ -43,6 +43,7 @@
 				</span>
         </div>
 
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
         <input type="submit" class="btn btn-secondary" value="Pošalji">
         <input onclick="resetForm()" class="btn btn-warning" value="Obriši">
     </form>

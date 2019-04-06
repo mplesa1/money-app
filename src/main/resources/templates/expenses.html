@@ -20,7 +20,7 @@
     <h2>Stanje novčanika</h2>
     <p th:text="${total}"></p>
     <button class="btn-warning" onclick="goBackPage()">Vratite se nazad</button>
-    <a class="btn btn-warning" href="/expense/resetWallet">Reset novčanik</a>
+    <a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-warning" href="/expense/resetWallet">Reset novčanik</a>
 </div>
 
 <div th:replace="fragments :: js"></div>
