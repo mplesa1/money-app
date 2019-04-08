@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+    <div th:each="role : ${roles}">
+        <h3>Naziv role</h3> <br>
+        <p th:text="${role}"> </p>
+    </div>
+</div>
+
+<div th:replace="fragments :: js"></div>
+
+</body>
+</html>

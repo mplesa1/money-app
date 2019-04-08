@@ -3,6 +3,9 @@ package hr.java.web.plesa.controller;
 import hr.java.web.plesa.domain.Expense;
 import hr.java.web.plesa.domain.Wallet;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -11,12 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Controller
 @RequestMapping("/expense")
 @SessionAttributes({"types", "wallet"})
 public class ExpenseController {
+
+    @GetMapping("/roles")
+    public String showRoles(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+        model.addAttribute("roles", roles);
+        return "userRoles";
+    }
 
     @GetMapping("/new")
     public String showForm(Model model) {
