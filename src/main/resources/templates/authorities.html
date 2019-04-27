@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+<div th:each="authority : ${authorities}">
+    <h2>Korisnik</h2>
+    <h3>Username</h3> <br>
+    <p th:text="${authority.username}"> </p>
+    <h3>Authority</h3> <br>
+    <p th:text="${authority.authority}"> </p>
+    <form action="#" th:action="@{'/admin/addRole/'  + ${authority.username}}" method="post">
+        <input type="hidden" name="username" value="${authority.username}"/>
+        <button type="submit" >Dodaj admin rolu</button>
+    </form>
+    <form action="#" th:action="@{'/admin/removeRole/'  + ${authority.username} + '/' + ${authority.authority}}" method="post">
+        <button type="submit" >Izbrisi admin rolu</button>
+    </form>
+    <br>
+</div>
+
+</div>
+
+<div th:replace="fragments :: js"></div>
+<script>
+    function goBackPage() {
+        window.history.back();
+    }
+</script>
+
+</body>
+</html>
