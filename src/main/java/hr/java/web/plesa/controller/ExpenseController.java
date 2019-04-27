@@ -43,7 +43,7 @@ public class ExpenseController {
             wallet = new Wallet();
             wallet.setType(Wallet.WalletType.CASH);
 
-            wallet = walletRepository.save(wallet, username);
+            wallet = walletRepository.save(wallet);
         }
 
 
