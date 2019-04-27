@@ -2,7 +2,11 @@ package hr.java.web.plesa.controller;
 
 import hr.java.web.plesa.domain.Expense;
 import hr.java.web.plesa.domain.Wallet;
+import hr.java.web.plesa.repository.IExpenseRepository;
+import hr.java.web.plesa.repository.IWalletRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -11,50 +15,86 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 @Slf4j
 @Controller
 @RequestMapping("/expense")
-@SessionAttributes({"types", "wallet"})
+@SessionAttributes({"types"})
 public class ExpenseController {
 
-    @GetMapping("/new")
+    private IExpenseRepository expenseRepository;
+    private IWalletRepository walletRepository;
+
+    public ExpenseController(IExpenseRepository expenseRepository, IWalletRepository walletRepository) {
+        this.expenseRepository = expenseRepository;
+        this.walletRepository = walletRepository;
+    }
+
+    @GetMapping("/newExpense")
     public String showForm(Model model) {
+
+        String username = getUserName();
+        Wallet wallet;
+        try {
+            wallet = walletRepository.findOne(username);
+        } catch (Exception e) {
+
+            wallet = new Wallet();
+            wallet.setType(Wallet.WalletType.CASH);
+
+            wallet = walletRepository.save(wallet, username);
+        }
+
+
         model.addAttribute("expense", new Expense());
-        model.addAttribute("types", Expense.TypeOfExpense.values());
+        model.addAttribute("types", Expense.ExpenseType.values());
         return "newExpense";
     }
 
-    @PostMapping("/new")
+    private String getUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
+    @PostMapping("/newExpense")
     public String processForm(@Validated Expense expense, Errors errors, Model model, HttpSession session) {
 
         if (errors.hasErrors()) {
-            log.info("Model has errore.");
+            log.info("Model ima errore.");
             return "newExpense";
         }
 
-        var wallet = (Wallet)session.getAttribute("wallet");
-        wallet.addExpense(expense);
+        var wallet = walletRepository.findOne(getUserName());
+        var walletID = wallet.getId();
 
-        model.addAttribute("expenses", wallet.getExpenses());
-        model.addAttribute("total", wallet.getTotal());
+        // dodavanje expense u bazu
+        expenseRepository.save(expense, walletID);
+
+        // dodavanje expensea u model
+        //model.addAttribute("expense", expense);
+
+        // dohvaćanje iz baze svih troškova i računanje totala
+        var expenseList = new ArrayList<Expense>();
+        expenseRepository.findAllByWalletId(walletID).iterator().forEachRemaining(
+                e -> expenseList.add(e)
+        );
+        var expenses = expenseRepository.findAllByWalletId(walletID);
+        var total = expenseList.stream().map(e -> e.getAmount()).reduce((e1, e2) -> e1.add(e2)).get();
+
+        model.addAttribute("expenses", expenses);
+        model.addAttribute("total", total);
         return "expenses";
     }
 
     @GetMapping("/resetWallet")
-    public String resetWallet(SessionStatus sessionStatus) {
-        sessionStatus.setComplete();
-        log.info("Wallet reset.");
-        return "redirect:/expense/new";
-    }
+    public String resetWallet() {
 
-    // when a request comes in, the first thing Spring will do is to notice @SessionAttributes
-    // and then attempt to find the value  in javax.servlet.http.HttpSession.
-    // If it doesn't find the value, then the method with @ModelAttribute having the same name
-    // will be invoked
-    @ModelAttribute("wallet")
-    public Wallet setWallet(Model model){
-        log.info("New wallet.");
-        return new Wallet();
+        var walletID = walletRepository.findOne(getUserName()).getId();
+
+        expenseRepository.removeExpensesFromWallet(walletID);
+
+        log.info("Resetiran wallet.");
+        return "redirect:/expense/newExpense";
     }
 }

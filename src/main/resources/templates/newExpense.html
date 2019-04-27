@@ -31,14 +31,14 @@
         </div>
 
         <div class="form-group">
-            <label for="typeOfExpense">Vrsta troška</label>
+            <label for="type">Vrsta troška</label>
             <select  class="form-control"
-                     th:field="*{typeOfExpense}">
+                     th:field="*{expenseType}">
                 <option value="">---Odaberite vrijednost---</option>
                 <option th:each="type : ${types}" th:value="${type}"
                         th:text="${type}"></option>
             </select>
-            <span class="text-danger" th:if="${#fields.hasErrors('typeOfExpense')}" th:errors="*{typeOfExpense}">
+            <span class="text-danger" th:if="${#fields.hasErrors('expenseType')}" th:errors="*{expenseType}">
 					Expense type error
 				</span>
         </div>

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +12,27 @@ import java.util.List;
 @NoArgsConstructor
 public class Wallet {
 
-    private List<Expense> expenses = new ArrayList<Expense>();
+    private Long id;
+
+    private LocalDateTime createDate;
+
+    private WalletType type;
+
+    public enum WalletType {
+        CASH,
+        CARD
+    }
+
+    private List<Expense> expenseList = new ArrayList<Expense>();
 
     public void addExpense(Expense expense){
-        expenses.add(expense);
+        expenseList.add(expense);
     }
 
     public BigDecimal getTotal() {
-        return expenses.stream()
+        return expenseList.stream()
                 .map(expense -> expense.getAmount())
-                .reduce((expense, expense2) -> expense.add(expense2))
+                .reduce((e1, e2) -> e1.add(e2))
                 .get();
     }
 }
