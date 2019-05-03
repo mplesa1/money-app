@@ -42,6 +42,6 @@ public class WalletController {
 
     @PutMapping("/{walletId}")
     public String update(Wallet wallet, @PathVariable(value="walletId") Long walletId){
-        var checkWallet
+        return "";
     }
 }
