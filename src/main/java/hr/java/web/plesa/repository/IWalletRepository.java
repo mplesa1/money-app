@@ -2,12 +2,14 @@ package hr.java.web.plesa.repository;
 
 import hr.java.web.plesa.domain.Wallet;
 
+import java.util.List;
+
 public interface IWalletRepository {
 
-    Iterable<Wallet> findAll();
+    List<Wallet> findAll();
 
     Wallet findOne(String username);
 
-    Wallet save(Wallet wallet, String username);
+    Wallet save(Wallet wallet);
 
 }

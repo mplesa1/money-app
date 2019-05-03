@@ -1,76 +1,68 @@
 package hr.java.web.plesa.repository;
 
+
 import hr.java.web.plesa.domain.Expense;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import hr.java.web.plesa.domain.Wallet;
+import org.hibernate.Session;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.util.List;
 
+@Primary
 @Repository
+@Transactional
 public class ExpenseRepository implements IExpenseRepository {
 
-    private JdbcTemplate jdbc;
-    private SimpleJdbcInsert expenseInserter;
+    //  you can also get Hibernate's session by calling getDelegate() method
+    private final EntityManager em;
 
-    public ExpenseRepository(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-        this.expenseInserter = new SimpleJdbcInsert(jdbc)
-                .withTableName("expense")
-                .usingGeneratedKeyColumns("id");
+    public ExpenseRepository(EntityManager em) {
+        this.em = em;
     }
 
     @Override
-    public Iterable<Expense> findAll() {
-        return jdbc.query("SELECT * FROM expense", this::mapRowToExpense);
+    public List<Expense> findAll() {
+        return ((Session)em.getDelegate())
+                .createQuery("SELECT e FROM Expense e", Expense.class)
+                .getResultList();
     }
 
     @Override
-    public Iterable<Expense> findAllByWalletId(Long id) {
-        return jdbc.query("SELECT * FROM expense WHERE wallet_id = " + id, this::mapRowToExpense);
+    public List<Expense> findAllByWalletId(Long id) {
+        var query = ((Session)em.getDelegate()).createQuery("FROM Expense where wallet_id = ?0");
+
+        query.setParameter(0, id);
+
+        return (List<Expense>) query.getResultList(); // isto ko list()
     }
 
     @Override
     public Expense findOne(Long id) {
-//        return jdbc.query("SELECT * FROM expense WHERE id = ?", this::mapRowToExpense);
-        return null;
+        return ((Session)em.getDelegate()).find(Expense.class, id);
     }
 
     @Override
     public Expense save(Expense expense, Long walletID) {
+        var session = (Session) em.getDelegate();
 
-        expense.setCreateDate( LocalDateTime.now() );
-        expense.setId(saveExpense(expense, walletID));
+        var wallet = session.load(Wallet.class, walletID);
+
+        expense.setWallet(wallet);
+
+        session.save(expense);
+
         return expense;
     }
+
 
     @Override
     public void removeExpensesFromWallet(Long walletID) {
-        jdbc.update("DELETE FROM expense WHERE wallet_id = ?", walletID);
-    }
+        var query = ((Session)em.getDelegate()).createQuery("DELETE FROM Expense WHERE wallet_id = ?1");
+        query.setParameter(1, walletID);
 
-    private long saveExpense(Expense expense, Long walletID) {
-        Map<String, Object> values = new HashMap<>();
-        values.put("name", expense.getName());
-        values.put("expenseType", expense.getExpenseType());
-        values.put("amount", expense.getAmount());
-        values.put("createDate", expense.getCreateDate());
-        values.put("wallet_id", walletID);
-
-        return expenseInserter.executeAndReturnKey(values).longValue();
-
-    }
-
-    private Expense mapRowToExpense (ResultSet rs, int rowNum) throws SQLException {
-        Expense expense = new Expense();
-        expense.setId(rs.getLong("id"));
-        expense.setAmount(rs.getBigDecimal("amount"));
-        expense.setExpenseType(Expense.ExpenseType.valueOf(rs.getString("expenseType")));
-        expense.setName(rs.getString("name"));
-        return expense;
+        query.executeUpdate();
     }
 }
