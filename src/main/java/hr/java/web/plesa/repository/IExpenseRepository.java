@@ -16,4 +16,7 @@ public interface IExpenseRepository {
 
     void removeExpensesFromWallet(Long walletID);
 
+    Expense update(Expense expense, Long walletID);
+
+    void delete(Expense expense);
 }

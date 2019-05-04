@@ -57,6 +57,24 @@ public class ExpenseRepository implements IExpenseRepository {
         return expense;
     }
 
+    @Override
+    public Expense update(Expense expense, Long walletID) {
+        var session = (Session) em.getDelegate();
+
+        var wallet = session.load(Wallet.class, walletID);
+
+        expense.setWallet(wallet);
+
+        session.update(expense);
+
+        return expense;
+    }
+
+    @Override
+    public void delete(Expense expense) {
+        var session = (Session) em.getDelegate();
+        session.delete(expense);
+    }
 
     @Override
     public void removeExpensesFromWallet(Long walletID) {
