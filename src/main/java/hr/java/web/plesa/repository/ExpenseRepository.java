@@ -65,4 +65,10 @@ public class ExpenseRepository implements IExpenseRepository {
 
         query.executeUpdate();
     }
+
+    @Override
+    public void update(Expense expense) {
+        var session = (Session) em.getDelegate();
+        session.update(expense);
+    }
 }

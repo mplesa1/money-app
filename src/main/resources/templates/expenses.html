@@ -15,6 +15,7 @@
     <p th:text="${expense.amount}"> </p>
     <h3>Vrsta troška</h3> <br>
     <p  th:text="${expense.expenseType}"> </p>
+    <a th:href="@{'/expense/updateExpense/' + ${expense.id}}">Uredi trošak</a>
     <br>
 </div>
     <h2>Stanje novčanika</h2>

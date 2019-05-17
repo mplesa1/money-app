@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Slf4j
@@ -52,6 +53,17 @@ public class ExpenseController {
         return "newExpense";
     }
 
+    @GetMapping("/updateExpense/{id}")
+    public String showUpdateForm(Model model, @PathVariable Long id) {
+
+       var expense = expenseRepository.findOne(id);
+
+
+        model.addAttribute("expense", expense);
+        model.addAttribute("types", Expense.ExpenseType.values());
+        return "updateExpense";
+    }
+
     private String getUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
@@ -70,6 +82,37 @@ public class ExpenseController {
 
         // dodavanje expense u bazu
         expenseRepository.save(expense, walletID);
+
+        // dodavanje expensea u model
+        //model.addAttribute("expense", expense);
+
+        // dohvaćanje iz baze svih troškova i računanje totala
+        var expenseList = new ArrayList<Expense>();
+        expenseRepository.findAllByWalletId(walletID).iterator().forEachRemaining(
+                e -> expenseList.add(e)
+        );
+        var expenses = expenseRepository.findAllByWalletId(walletID);
+        var total = expenseList.stream().map(e -> e.getAmount()).reduce((e1, e2) -> e1.add(e2)).get();
+
+        model.addAttribute("expenses", expenses);
+        model.addAttribute("total", total);
+        return "expenses";
+    }
+
+    @PostMapping("/updateExpense/{id}")
+    public String processUpdateForm(@Validated Expense expense, Errors errors, Model model, HttpSession session, @PathVariable Long id) {
+
+        if (errors.hasErrors()) {
+            log.info("Model ima errore.");
+            return "newExpense";
+        }
+
+        var wallet = walletRepository.findOne(getUserName());
+        var walletID = wallet.getId();
+        expense.setCreateDate(LocalDateTime.now());
+        expense.setWallet(wallet);
+        // dodavanje expense u bazu
+        expenseRepository.update(expense);
 
         // dodavanje expensea u model
         //model.addAttribute("expense", expense);

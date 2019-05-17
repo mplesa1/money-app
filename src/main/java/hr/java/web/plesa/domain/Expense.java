@@ -51,4 +51,8 @@ public class Expense implements Serializable { // serializable nije nužan
         WASTING_MONEY_ON_STUFF_YOU_DONT_NEED
 
     }
+
+    public String toString(){
+        return name + " " + amount;
+    }
 }

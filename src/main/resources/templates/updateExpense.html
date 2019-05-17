@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: head"></head>
+<head th:replace="fragments :: header"></head>
+<body>
+<div class="container">
+
+    <h4>Unosite novi trošak:</h4>
+    <form method="post" th:action="@{'/expense/updateExpense/'+ ${expense.id}}" th:object="${expense}" id="updateFormExpense">
+
+
+        <div class="form-group">
+            <label for="name">Naziv</label>
+            <input type="text"	class="form-control" th:field="*{name}" />
+            <span class="text-danger" th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}">
+					Name error
+				</span>
+        </div>
+
+
+        <div class="form-group">
+            <label for="amount">Iznos</label>
+            <input type="number" class="form-control" th:field="*{amount}" min="0" placeholder="0.00" />
+            <span class="text-danger" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">
+					Amount error
+				</span>
+        </div>
+
+        <div class="form-group">
+            <label for="type">Vrsta troška</label>
+            <select  class="form-control"
+                     th:field="*{expenseType}">
+                <option value="">---Odaberite vrijednost---</option>
+                <option th:each="type : ${types}" th:value="${type}"
+                        th:text="${type}"></option>
+            </select>
+            <span class="text-danger" th:if="${#fields.hasErrors('expenseType')}" th:errors="*{expenseType}">
+					Expense type error
+				</span>
+        </div>
+
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <input type="submit" class="btn btn-secondary" value="Pošalji">
+        <input onclick="resetForm()" class="btn btn-warning" value="Obriši">
+    </form>
+</div>
+
+<div th:replace="fragments :: js"></div>
+</body>
+</html>
