@@ -51,4 +51,16 @@ public class Expense implements Serializable { // serializable nije nužan
         WASTING_MONEY_ON_STUFF_YOU_DONT_NEED
 
     }
+
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", createDate=" + createDate +
+                ", name='" + name + '\'' +
+                ", amount=" + amount +
+                ", expenseType=" + expenseType +
+                ", wallet=" + wallet +
+                '}';
+    }
 }

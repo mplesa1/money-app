@@ -1,11 +1,16 @@
 package hr.java.web.plesa.controller;
 
 import hr.java.web.plesa.domain.Expense;
+import hr.java.web.plesa.dto.ExpenseDto;
 import hr.java.web.plesa.repository.ExpenseRepository;
 import hr.java.web.plesa.repository.WalletRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path="/api/expense", produces="application/json")
@@ -13,46 +18,56 @@ import org.springframework.web.bind.annotation.*;
 public class ExpenseRestController {
     private final ExpenseRepository expenseRepository;
     private final WalletRepository walletRepository;
+    private final ModelMapper modelMapper;
 
-    public ExpenseRestController(ExpenseRepository expenseRepository, WalletRepository walletRepository) {
+    public ExpenseRestController(ExpenseRepository expenseRepository, WalletRepository walletRepository, ModelMapper modelMapper) {
         this.expenseRepository = expenseRepository;
         this.walletRepository = walletRepository;
+        this.modelMapper = modelMapper;
     }
 
         @GetMapping
-        public Iterable<Expense> findAll() {
+        public List<ExpenseDto> findAll() {
 
             var expenses = expenseRepository.findAll();
-
-            return expenses;
+            // Define the target type
+            java.lang.reflect.Type targetListType = new TypeToken<List<ExpenseDto>>() {}.getType();
+            List<ExpenseDto> expenseDtos = modelMapper.map(expenses, targetListType);
+            return expenseDtos;
         }
 
         @GetMapping("/{id}")
-        public ResponseEntity<Expense> findOne(@PathVariable Long id) {
+        public ResponseEntity<ExpenseDto> findOne(@PathVariable Long id) {
             var expense = expenseRepository.findOne(id);
 
             if (expense == null){
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }else {
-                return new ResponseEntity<>(expense, HttpStatus.OK);
+                return new ResponseEntity<>(modelMapper.map(expense, ExpenseDto.class), HttpStatus.OK);
             }
         }
 
         @ResponseStatus(HttpStatus.CREATED)
         @PostMapping(path = "/{walletId}", consumes="application/json")
-        public Expense save(@RequestBody Expense expense, @PathVariable Long walletId) {
+        public ExpenseDto save(@RequestBody Expense expense, @PathVariable Long walletId) {
             var newExpense = expenseRepository.save(expense, walletId);
-            return newExpense;
+
+            return modelMapper.map(newExpense, ExpenseDto.class);
         }
 
         @PutMapping("/{id}/{walletId}")
-        public Expense update(@RequestBody Expense expense, @PathVariable Long id, @PathVariable Long walletId) {
+        public ExpenseDto update(@RequestBody Expense expense, @PathVariable Long id, @PathVariable Long walletId) {
             var expenseCheck = expenseRepository.findOne(id);
             if (expenseCheck == null){
                 return null;
             }else {
-                expenseRepository.update(expense, walletId);
-                return expense;
+                var wallet = walletRepository.findById(walletId);
+                expenseCheck.setWallet(wallet);
+                expenseCheck.setName(expense.getName());
+                expenseCheck.setAmount(expense.getAmount());
+                expenseCheck.setExpenseType(expense.getExpenseType());
+                var updatedExpense = expenseRepository.update(expenseCheck);
+                return modelMapper.map(updatedExpense, ExpenseDto.class);
             }
         }
 

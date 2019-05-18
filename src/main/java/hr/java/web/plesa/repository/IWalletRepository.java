@@ -12,4 +12,5 @@ public interface IWalletRepository {
 
     Wallet save(Wallet wallet);
 
+    Wallet findById(Long id);
 }

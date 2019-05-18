@@ -42,4 +42,14 @@ public class WalletRepository implements IWalletRepository {
 
         return  wallet;
     }
+
+    @Override
+    public Wallet findById(Long id) {
+        var lista = ((Session)em.getDelegate())
+                .createQuery("FROM Wallet WHERE id = ?1")
+                .setParameter(1, id)
+                .list();
+
+        return  (Wallet) lista.get(0);
+    }
 }

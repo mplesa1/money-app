@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
-@NoArgsConstructor
 public class Wallet implements Serializable {
 
     @Id
@@ -39,5 +37,55 @@ public class Wallet implements Serializable {
     public enum WalletType {
         CASH,
         CARD
+    }
+
+    public Wallet(LocalDateTime createDate, WalletType type, List<Expense> expenses, String username) {
+        this.createDate = createDate;
+        this.type = type;
+        this.expenses = expenses;
+        this.username = username;
+    }
+
+    public Wallet() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public WalletType getType() {
+        return type;
+    }
+
+    public void setType(WalletType type) {
+        this.type = type;
+    }
+
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(List<Expense> expenses) {
+        this.expenses = expenses;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
