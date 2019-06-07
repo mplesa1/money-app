@@ -1,7 +1,7 @@
 package hr.java.web.plesa.domain;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
@@ -12,16 +12,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class Expense implements Serializable { // serializable nije nužan
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private LocalDateTime createDate;
+public class Expense extends BaseEntity {
 
     @NotEmpty(message = "Niste unijeli naziv troška.")
     @Size(min = 2, max = 35, message = "Naziv mora imati između 2 i 35 znakova.")
@@ -39,12 +35,8 @@ public class Expense implements Serializable { // serializable nije nužan
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
-    @PrePersist
-    protected void onCreate() {
-        createDate = LocalDateTime.now();
-    }
 
-    public static enum ExpenseType {
+    public enum ExpenseType {
 
         FOOD,
         DRINKS,
@@ -55,8 +47,6 @@ public class Expense implements Serializable { // serializable nije nužan
     @Override
     public String toString() {
         return "Expense{" +
-                "id=" + id +
-                ", createDate=" + createDate +
                 ", name='" + name + '\'' +
                 ", amount=" + amount +
                 ", expenseType=" + expenseType +

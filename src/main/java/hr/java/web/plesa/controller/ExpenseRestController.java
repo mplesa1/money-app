@@ -38,7 +38,7 @@ public class ExpenseRestController {
 
         @GetMapping("/{id}")
         public ResponseEntity<ExpenseDto> findOne(@PathVariable Long id) {
-            var expense = expenseRepository.findOne(id);
+            var expense = expenseRepository.findById(id);
 
             if (expense == null){
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -50,33 +50,36 @@ public class ExpenseRestController {
         @ResponseStatus(HttpStatus.CREATED)
         @PostMapping(path = "/{walletId}", consumes="application/json")
         public ExpenseDto save(@RequestBody Expense expense, @PathVariable Long walletId) {
-            var newExpense = expenseRepository.save(expense, walletId);
+            var wallet = walletRepository.findById(walletId);
+            expense.setWallet(wallet.get());
+            var newExpense = expenseRepository.save(expense);
 
             return modelMapper.map(newExpense, ExpenseDto.class);
         }
 
         @PutMapping("/{id}/{walletId}")
         public ExpenseDto update(@RequestBody Expense expense, @PathVariable Long id, @PathVariable Long walletId) {
-            var expenseCheck = expenseRepository.findOne(id);
+            var expenseOptional = expenseRepository.findById(id);
+            var expenseCheck = expenseOptional.get();
             if (expenseCheck == null){
                 return null;
             }else {
                 var wallet = walletRepository.findById(walletId);
-                expenseCheck.setWallet(wallet);
+                expenseCheck.setWallet(wallet.get());
                 expenseCheck.setName(expense.getName());
                 expenseCheck.setAmount(expense.getAmount());
                 expenseCheck.setExpenseType(expense.getExpenseType());
-                var updatedExpense = expenseRepository.update(expenseCheck);
-                return modelMapper.map(updatedExpense, ExpenseDto.class);
+                expenseRepository.save(expenseCheck);
+                return modelMapper.map(expenseCheck, ExpenseDto.class);
             }
         }
 
         @ResponseStatus(HttpStatus.NO_CONTENT)
         @DeleteMapping("/{id}")
         public void delete(@PathVariable Long id) {
-            var expense = expenseRepository.findOne(id);
-            if (expense != null){
-                expenseRepository.delete(expense);
+            var expense = expenseRepository.findById(id);
+            if (expense.get() != null){
+                expenseRepository.delete(expense.get());
             }
         }
 }

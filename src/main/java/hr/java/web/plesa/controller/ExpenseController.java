@@ -2,8 +2,8 @@ package hr.java.web.plesa.controller;
 
 import hr.java.web.plesa.domain.Expense;
 import hr.java.web.plesa.domain.Wallet;
-import hr.java.web.plesa.repository.IExpenseRepository;
-import hr.java.web.plesa.repository.IWalletRepository;
+import hr.java.web.plesa.repository.ExpenseRepository;
+import hr.java.web.plesa.repository.WalletRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,9 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Slf4j
@@ -23,10 +23,10 @@ import java.util.ArrayList;
 @SessionAttributes({"types"})
 public class ExpenseController {
 
-    private IExpenseRepository expenseRepository;
-    private IWalletRepository walletRepository;
+    private ExpenseRepository expenseRepository;
+    private WalletRepository walletRepository;
 
-    public ExpenseController(IExpenseRepository expenseRepository, IWalletRepository walletRepository) {
+    public ExpenseController(ExpenseRepository expenseRepository, WalletRepository walletRepository) {
         this.expenseRepository = expenseRepository;
         this.walletRepository = walletRepository;
     }
@@ -36,15 +36,14 @@ public class ExpenseController {
 
         String username = getUserName();
         Wallet wallet;
-        try {
-            wallet = walletRepository.findOne(username);
-        } catch (Exception e) {
+        wallet = walletRepository.findByUsername(username);
 
-            wallet = new Wallet();
-            wallet.setType(Wallet.WalletType.CASH);
-
-            wallet = walletRepository.save(wallet);
-        }
+       if (wallet == null) {
+           wallet = new Wallet();
+           wallet.setType(Wallet.WalletType.CASH);
+           wallet.setUsername(username);
+           walletRepository.save(wallet);
+       }
 
 
         model.addAttribute("expense", new Expense());
@@ -64,12 +63,12 @@ public class ExpenseController {
             log.info("Model ima errore.");
             return "newExpense";
         }
-
-        var wallet = walletRepository.findOne(getUserName());
+        var username = getUserName();
+        var wallet = walletRepository.findByUsername(username);
         var walletID = wallet.getId();
-
+        expense.setWallet(wallet);
         // dodavanje expense u bazu
-        expenseRepository.save(expense, walletID);
+        expenseRepository.save(expense);
 
         // dodavanje expensea u model
         //model.addAttribute("expense", expense);
@@ -90,11 +89,29 @@ public class ExpenseController {
     @GetMapping("/resetWallet")
     public String resetWallet() {
 
-        var walletID = walletRepository.findOne(getUserName()).getId();
+        var wallet = walletRepository.findByUsername(getUserName());
 
-        expenseRepository.removeExpensesFromWallet(walletID);
+        expenseRepository.deleteAllByWalletId(wallet.getId());
 
         log.info("Resetiran wallet.");
         return "redirect:/expense/newExpense";
+    }
+
+    @GetMapping
+    public String expenseSearch(@RequestParam(value = "query", required = false) String name,
+                                  Model model) {
+        var wallet = walletRepository.findByUsername(getUserName());
+
+        var expenses = expenseRepository.findAllByWalletIdInAndNameLike(wallet.getId(), name);
+        if (expenses.size() == 0) {
+            expenses = expenseRepository.findAllByWalletId(wallet.getId());
+        }
+
+        var total = expenses.stream().map(e -> e.getAmount()).reduce((e1, e2) -> e1.add(e2)).get();
+
+        model.addAttribute("expenses", expenses);
+        model.addAttribute("total", total);
+        return "expenses";
+
     }
 }

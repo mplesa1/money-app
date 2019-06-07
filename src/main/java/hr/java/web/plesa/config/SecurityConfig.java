@@ -41,8 +41,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .csrf()
-                .ignoringAntMatchers("/api/**", "/login", "/logout");
-
+                .ignoringAntMatchers("/api/**", "/login", "/logout", "/h2-console/**");
+//              http.authorizeRequests().antMatchers("/h2-console/**").permitAll();
+//
+//        http.csrf().disable();
+        http.headers().frameOptions().disable();
     }
 
     @Override

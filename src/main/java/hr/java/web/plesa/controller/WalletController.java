@@ -1,30 +1,21 @@
 package hr.java.web.plesa.controller;
 
-import hr.java.web.plesa.domain.Expense;
-import hr.java.web.plesa.domain.Wallet;
-import hr.java.web.plesa.repository.IExpenseRepository;
-import hr.java.web.plesa.repository.IWalletRepository;
+import hr.java.web.plesa.repository.ExpenseRepository;
+import hr.java.web.plesa.repository.WalletRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 
 @Slf4j
 @Controller
 @RequestMapping("/wallet")
 public class WalletController {
 
-    private IExpenseRepository expenseRepository;
-    private IWalletRepository walletRepository;
+    private ExpenseRepository expenseRepository;
+    private WalletRepository walletRepository;
 
-    public WalletController(IExpenseRepository expenseRepository, IWalletRepository walletRepository) {
+    public WalletController(ExpenseRepository expenseRepository, WalletRepository walletRepository) {
         this.expenseRepository = expenseRepository;
         this.walletRepository = walletRepository;
     }
