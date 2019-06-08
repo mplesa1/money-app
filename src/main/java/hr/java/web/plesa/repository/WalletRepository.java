@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface WalletRepository extends CrudRepository<Wallet, Long> {
     Wallet findByUsername(String username);
+
+    List<Wallet> findAllByUsername(String username);
+
+    List<Wallet> findAll();
 }

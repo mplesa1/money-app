@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class Wallet extends BaseEntity{
 
     private String username;
 
+    @Transient
+    private BigDecimal total;
 
     public enum WalletType {
         CASH,
@@ -32,6 +35,15 @@ public class Wallet extends BaseEntity{
     }
 
     public Wallet() {
+    }
+
+    public void setTotal() {
+        var total = expenses.stream().map(e -> e.getAmount()).reduce((e1, e2) -> e1.add(e2)).get();
+        this.total = total;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
     }
 
     public WalletType getType() {
