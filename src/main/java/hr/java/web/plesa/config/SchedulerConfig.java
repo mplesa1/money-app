@@ -20,4 +20,13 @@ public class SchedulerConfig {
                 .withIdentity("testTrigger")
                 .withSchedule(scheduleBuilder).build();
     }
+    public CronTrigger testCronTrigger() {
+        CronTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity("cronTrigger", "group1")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 15 10 ? * 5#1"))
+                .forJob("myJob", "group1")
+                .build();
+
+        return trigger;
+    }
 }

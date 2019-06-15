@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 
 import java.math.BigDecimal;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ExpenseRestControllerTest {
+public class ExpenseRestControllerTest {
 
     private String password = new BCryptPasswordEncoder().encode("adminpass");
     private String user = "admin";
@@ -47,7 +48,7 @@ class ExpenseRestControllerTest {
 
 
     @Before
-    void setUp() {
+    public void setUp() {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(Expense.class)
                 .addAnnotatedClass(Wallet.class);
@@ -65,13 +66,20 @@ class ExpenseRestControllerTest {
     }
 
     @Test
-    void findOne() throws Exception {
+    public void findOne() throws Exception {
         this.mockMvc.perform(get("/api/expense/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
-                .andExpect(jsonPath("$.name", is("Kava")));
+                .andExpect(jsonPath("$.name", is("Žuja")))
+                .andExpect(jsonPath("$.amount", is(15)));
     }
 
     @Test
-    void save() throws Exception {
+    public void findAll() throws Exception {
+        this.mockMvc.perform(get("/api/expense").with(user(this.user).password(password).roles("ADMIN", "USER")))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+    }
+
+    @Test
+    public void save() throws Exception {
 
         Expense expense = new Expense();
         expense.setName("test");
@@ -85,7 +93,7 @@ class ExpenseRestControllerTest {
     }
 
     @Test
-    void update() throws Exception {
+    public void update() throws Exception {
 
         Expense expense = new Expense();
         expense.setName("test");
@@ -101,7 +109,7 @@ class ExpenseRestControllerTest {
     }
 
     @Test
-    void delete() throws Exception {
+    public void delete() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/expense/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
                 .andExpect(status().isNoContent());
     }

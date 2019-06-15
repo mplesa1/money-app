@@ -88,8 +88,8 @@ public class ExpenseControllerTest {
                 .password(new BCryptPasswordEncoder().encode("adminpass"))
                 .roles("ADMIN", "USER"))
                 .with(csrf())
-                .param("name", "cevapi")
-                .param("amount", "30")
+                .param("name", "Kebab")
+                .param("amount", "25")
                 .param("expenseType", "FOOD"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("expenses"));
@@ -101,8 +101,8 @@ public class ExpenseControllerTest {
                 .password(new BCryptPasswordEncoder().encode("adminpass"))
                 .roles("ADMIN", "USER"))
                 .with(csrf())
-                .param("query", "cevapi"))
-                .andExpect(model().attribute("expenses", Matchers.hasSize(3)));
+                .param("query", "Kebab"))
+                .andExpect(model().attribute("expenses", Matchers.hasSize(1)));
     }
 
     @Test
