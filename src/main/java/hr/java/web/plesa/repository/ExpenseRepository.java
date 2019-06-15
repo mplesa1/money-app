@@ -11,4 +11,6 @@ public interface ExpenseRepository extends CrudRepository<Expense, Long> {
     void deleteAllByWalletId(Long walletId);
 
     List<Expense> findAllByWalletIdInAndNameLike(Long walletId, String name);
+
+    List<Expense> findAll();
 }
