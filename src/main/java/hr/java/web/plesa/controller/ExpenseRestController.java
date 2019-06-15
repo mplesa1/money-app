@@ -40,10 +40,11 @@ public class ExpenseRestController {
         public ResponseEntity<ExpenseDto> findOne(@PathVariable Long id) {
             var expense = expenseRepository.findById(id);
 
-            if (expense == null){
+            if (!expense.isPresent()){
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }else {
-                return new ResponseEntity<>(modelMapper.map(expense, ExpenseDto.class), HttpStatus.OK);
+                var expenseDto = modelMapper.map(expense.get(), ExpenseDto.class);
+                return new ResponseEntity<>(expenseDto, HttpStatus.OK);
             }
         }
 

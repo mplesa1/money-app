@@ -19,11 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
-
 import java.math.BigDecimal;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ExpenseRestControllerTest {
+class WalletRestControllerTest {
 
     private String password = new BCryptPasswordEncoder().encode("adminpass");
     private String user = "admin";
@@ -67,43 +65,39 @@ class ExpenseRestControllerTest {
 
     @Test
     void findOne() throws Exception {
-        this.mockMvc.perform(get("/api/expense/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
-                .andExpect(jsonPath("$.name", is("Kava")));
+        this.mockMvc.perform(get("/api/wallet/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
+                .andExpect(jsonPath("$.type", is("CASH")));
     }
 
     @Test
     void save() throws Exception {
 
-        Expense expense = new Expense();
-        expense.setName("test");
-        expense.setExpenseType(Expense.ExpenseType.FOOD);
-        expense.setAmount(new BigDecimal(2));
+        Wallet wallet = new Wallet();
+        wallet.setType(Wallet.WalletType.CASH);
+        wallet.setUsername("ADMIN");
 
-        this.mockMvc.perform(post("/api/expense/1").with(user(this.user).password(password).roles("ADMIN", "USER"))
-                .content(asJsonString(expense))
+        this.mockMvc.perform(post("/api/wallet").with(user(this.user).password(password).roles("ADMIN", "USER"))
+                .content(asJsonString(wallet))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isCreated());
     }
 
     @Test
     void update() throws Exception {
+        Wallet wallet = new Wallet();
+        wallet.setType(Wallet.WalletType.CASH);
+        wallet.setUsername("ADMIN");
 
-        Expense expense = new Expense();
-        expense.setName("test");
-        expense.setExpenseType(Expense.ExpenseType.FOOD);
-        expense.setAmount(new BigDecimal(2));
-        expense.setId(1L);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/expense/1/1").with(user(this.user).password(password).roles("ADMIN", "USER"))
-                .content(asJsonString(expense))
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/wallet/1").with(user(this.user).password(password).roles("ADMIN", "USER"))
+                .content(asJsonString(wallet))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("test")));
+                .andExpect(jsonPath("$.type", is("CASH")));
     }
 
     @Test
     void delete() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/expense/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/wallet/1").with(user(this.user).password(password).roles("ADMIN", "USER")))
                 .andExpect(status().isNoContent());
     }
 
