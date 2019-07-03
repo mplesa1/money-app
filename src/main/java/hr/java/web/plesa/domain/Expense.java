@@ -19,16 +19,16 @@ import java.time.LocalDateTime;
 @Entity
 public class Expense extends BaseEntity {
 
-    @NotEmpty(message = "Niste unijeli naziv troška.")
-    @Size(min = 2, max = 35, message = "Naziv mora imati između 2 i 35 znakova.")
+    @NotEmpty(message = "{validation.expense.name.notEmpty}.")
+    @Size(min = 2, max = 35, message = "{validation.expense.name.size}.")
     private String name;
 
-    @NotNull(message = "Niste unijeli iznos.")
-    @DecimalMin(value = "0.01", message = "Minimalan iznos je 0.01.")
+    @NotNull(message = "{validation.expense.amount.notNull}.")
+    @DecimalMin(value = "0.01", message = "{validation.expense.amount.min}.")
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Odaberite vrstu troška. Smjesta!")
+    @NotNull(message = "{validation.expense.expenseType}")
     private ExpenseType expenseType;
 
     @ManyToOne(fetch = FetchType.EAGER)

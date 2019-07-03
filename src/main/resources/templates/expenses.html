@@ -20,16 +20,17 @@
         </div>
     </form>
 <div th:each="expense : ${expenses}">
-    <h2>Unesen trošak:</h2>
-    <h3>Naziv</h3> <br>
+    <h3 th:text="#{msg.expense.name}"></h3>:
     <p th:text="${expense.name}"> </p>
-    <h3>Iznos</h3> <br>
+
+    <h3 th:text="#{msg.expense.amount}"></h3> <br>
     <p th:text="${expense.amount}"> </p>
-    <h3>Vrsta troška</h3> <br>
+
+    <h3 th:text="#{msg.expense.expenseType}"></h3> <br>
     <p  th:text="${expense.expenseType}"> </p>
     <br>
 </div>
-    <h2>Stanje novčanika</h2>
+    <h2>Total</h2>
     <p th:text="${total}"></p>
     <button class="btn-warning" onclick="goBackPage()">Vratite se nazad</button>
     <a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-warning" href="/expense/resetWallet">Reset novčanik</a>

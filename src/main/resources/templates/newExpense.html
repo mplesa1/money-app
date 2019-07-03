@@ -8,12 +8,12 @@
 <body>
 <div class="container">
 
-    <h4>Unosite novi trošak:</h4>
+    <h4 th:text="#{msg.newExpense}"></h4>
     <form method="POST" th:object="${expense}" id="formExpense">
 
 
         <div class="form-group">
-            <label for="name">Naziv</label>
+            <label for="name" th:text="#{msg.expense.name}"></label>
             <input type="text"	class="form-control" th:field="*{name}" />
             <span class="text-danger" th:if="${#fields.hasErrors('name')}"
                   th:errors="*{name}">
@@ -23,7 +23,7 @@
 
 
         <div class="form-group">
-            <label for="amount">Iznos</label>
+            <label for="amount" th:text="#{msg.expense.amount}"></label>
             <input type="number" class="form-control" th:field="*{amount}" min="0" placeholder="0.00" />
             <span class="text-danger" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">
 					Amount error
@@ -31,12 +31,12 @@
         </div>
 
         <div class="form-group">
-            <label for="type">Vrsta troška</label>
+            <label for="type" th:text="#{msg.expense.expenseType}"></label>
             <select  class="form-control"
                      th:field="*{expenseType}">
-                <option value="">---Odaberite vrijednost---</option>
+                <option value="">------</option>
                 <option th:each="type : ${types}" th:value="${type}"
-                        th:text="${type}"></option>
+                        th:text="#{msg.expense.expenseType. + ${type}}"></option>
             </select>
             <span class="text-danger" th:if="${#fields.hasErrors('expenseType')}" th:errors="*{expenseType}">
 					Expense type error
@@ -44,8 +44,8 @@
         </div>
 
         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-        <input type="submit" class="btn btn-secondary" value="Pošalji">
-        <input onclick="resetForm()" class="btn btn-warning" value="Obriši">
+        <input type="submit" class="btn btn-secondary" th:value="#{msg.send}">
+<!--        <input onclick="resetForm()" class="btn btn-warning" value="Obriši">-->
     </form>
 </div>
 <script>
