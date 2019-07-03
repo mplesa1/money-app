@@ -48,6 +48,7 @@ public class ExpenseController {
 
         model.addAttribute("expense", new Expense());
         model.addAttribute("types", Expense.ExpenseType.values());
+        model.addAttribute("placeOfExpenses", Expense.PlaceOfExpense.values());
         return "newExpense";
     }
 

@@ -22,6 +22,7 @@ create table if not exists wallet (
     name VARCHAR(50) not null,
     amount DECIMAL not null,
     expense_type VARCHAR(150) not null,
+    place_of_expense VARCHAR(150) not null,
 
     wallet_id bigint,
     FOREIGN KEY (wallet_id) REFERENCES wallet

@@ -31,6 +31,10 @@ public class Expense extends BaseEntity {
     @NotNull(message = "{validation.expense.expenseType}")
     private ExpenseType expenseType;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "{validation.expense.placeOfExpense}")
+    private PlaceOfExpense placeOfExpense;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
@@ -42,6 +46,12 @@ public class Expense extends BaseEntity {
         DRINKS,
         WASTING_MONEY_ON_STUFF_YOU_DONT_NEED
 
+    }
+
+    public enum PlaceOfExpense {
+        ZAGREB,
+        RIJEKA,
+        GORICA
     }
 
     @Override
